@@ -37,7 +37,7 @@ Employees ask questions in plain English through a responsive web interface, and
                      ▼
              [ Cohere Embeddings ] ────────────── (Semantic Retrieval / Namespace: hr-policies)
 
-
+---
 
 ### Key Workflow Highlights
 

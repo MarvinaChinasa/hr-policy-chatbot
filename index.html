@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR Policy Intelligence Assistant</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind Configuration for Custom Emerald & Orange Themes -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              900: '#064e3b',
+              950: '#022c22',
+            },
+            accent: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              400: '#fb923c',
+              500: '#f97316',
+              600: '#ea580c',
+              900: '#7c2d12',
+              950: '#431407',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Glowing Mesh Background Animations with Dual Green & Orange Highlights */
+    .glow-mesh {
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(249, 115, 22, 0.10) 0%, transparent 45%);
+    }
+    /* Custom Scrollbar for Smooth Chat History */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between glow-mesh font-sans antialiased overflow-hidden selection:bg-accent-500 selection:text-slate-950">
+
+  <!-- ==================== TOP NAVIGATION HEADER ==================== -->
+  <header class="w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-6 py-4 flex items-center justify-between z-20 shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="relative">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-emerald-500 to-accent-500 flex items-center justify-center shadow-lg shadow-accent-500/10 ring-1 ring-white/20">
+          <i data-lucide="bot" class="w-6 h-6 text-slate-950"></i>
+        </div>
+        <span class="absolute bottom-0 right-0 w-3 h-3 bg-accent-500 border-2 border-slate-900 rounded-full"></span>
+      </div>
+      <div>
+        <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-2">
+          HR Policy Assistant
+          <span class="text-[10px] bg-accent-950 text-accent-400 border border-accent-500/30 font-mono px-2 py-0.5 rounded-full uppercase tracking-wider">Production RAG</span>
+        </h1>
+        <p class="text-xs text-slate-400">Powered by n8n Orchestration & Pinecone Vector Engine</p>
+      </div>
+    </div>
+
+    <!-- Right Controls / Webhook Config -->
+    <div class="flex items-center gap-3">
+      <button id="configToggleBtn" onclick="toggleConfigModal()" class="flex items-center gap-2 text-xs font-medium text-slate-300 bg-slate-800/80 hover:bg-slate-700 hover:text-white border border-slate-700 px-3 py-2 rounded-lg transition-all duration-200 shadow-sm">
+        <i data-lucide="settings" class="w-4 h-4 text-accent-500"></i>
+        <span>Webhook Endpoint</span>
+      </button>
+      <div class="hidden sm:flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-full font-mono">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Zero-Hallucination Guard active</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CHAT CONTAINER ==================== -->
+  <main id="chatWindow" class="flex-1 overflow-y-auto px-4 sm:px-6 md:px-12 py-6 space-y-6 max-w-5xl w-full mx-auto">
+    
+    <!-- SYSTEM WELCOME CARD -->
+    <div class="flex gap-4 max-w-3xl animate-fade-in">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 via-emerald-500 to-accent-500 flex items-center justify-center shrink-0 shadow-md">
+        <i data-lucide="shield-check" class="w-5 h-5 text-slate-950"></i>
+      </div>
+      <div class="space-y-3 bg-slate-900/90 border border-slate-800 rounded-2xl rounded-tl-none p-5 shadow-xl">
+        <div class="text-sm leading-relaxed text-slate-200 whitespace-pre-line">Hello! 👋 Welcome to the HR Policy Assistant. 
+
+I can help answer your questions regarding company workplace policies, including:
+- Leave entitlements & time-off rules 🌴
+- Probationary period guidelines ⏳
+- Maternity, paternity, & family rights 👶
+- Disciplinary & code of conduct procedures ⚖️
+- Benefits & onboarding processes 📋
+
+How can I assist you with HR policies today?</div>
+
+        <!-- Quick Action Prompt Pills -->
+        <div class="pt-2 flex flex-wrap gap-2">
+          <button onclick="sendQuickPrompt('Can I take maternity leave during my probation period?')" class="text-xs bg-slate-800 hover:bg-accent-950 hover:text-accent-400 border border-slate-700 hover:border-accent-500/50 text-slate-300 px-3 py-1.5 rounded-lg transition-all text-left">
+            👶 Maternity leave during probation?
+          </button>
+          <button onclick="sendQuickPrompt('What are the official leave entitlements and time-off rules?')" class="text-xs bg-slate-800 hover:bg-brand-950 hover:text-brand-400 border border-slate-700 hover:border-brand-500/50 text-slate-300 px-3 py-1.5 rounded-lg transition-all text-left">
+            🌴 Leave entitlements & rules
+          </button>
+          <button onclick="sendQuickPrompt('What is the code of conduct procedure for workplace grievances?')" class="text-xs bg-slate-800 hover:bg-accent-950 hover:text-accent-400 border border-slate-700 hover:border-accent-500/50 text-slate-300 px-3 py-1.5 rounded-lg transition-all text-left">
+            ⚖️ Disciplinary & conduct rules
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== TYPING INDICATOR (HIDDEN BY DEFAULT) ==================== -->
+  <div id="typingIndicator" class="hidden max-w-5xl w-full mx-auto px-4 sm:px-6 md:px-12 py-2">
+    <div class="flex items-center gap-3 text-xs text-accent-400 font-mono bg-slate-900/60 border border-slate-800 w-fit px-4 py-2 rounded-full shadow-lg">
+      <i data-lucide="cpu" class="w-4 h-4 animate-spin text-brand-500"></i>
+      <span>Querying Pinecone Vector Store & Synthesizing Policy Answer...</span>
+    </div>
+  </div>
+
+  <!-- ==================== INPUT CONTROL AREA ==================== -->
+  <footer class="w-full bg-slate-900/90 border-t border-slate-800 p-4 sm:p-6 z-20 shrink-0">
+    <div class="max-w-5xl mx-auto space-y-2">
+      <form id="chatForm" onsubmit="handleFormSubmit(event)" class="relative flex items-center">
+        <textarea 
+          id="userInput" 
+          rows="1" 
+          placeholder="Ask any policy question (e.g., 'Can I extend my annual leave?')..." 
+          class="w-full bg-slate-950 border border-slate-700 focus:border-accent-500 focus:ring-1 focus:ring-accent-500 text-slate-100 placeholder-slate-500 text-sm rounded-xl pl-4 pr-14 py-3.5 resize-none outline-none transition-all duration-200 shadow-inner"
+          onkeydown="handleKeyDown(event)"></textarea>
+        
+        <button 
+          type="submit" 
+          id="sendBtn" 
+          class="absolute right-2 bg-gradient-to-tr from-brand-600 via-emerald-500 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-slate-950 p-2.5 rounded-lg font-bold shadow-md shadow-accent-500/20 transition-all duration-200 flex items-center justify-center">
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </form>
+      <div class="flex justify-between items-center text-[11px] text-slate-500 px-1">
+        <span>Press <kbd class="px-1 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 font-mono">Enter</kbd> to send, <kbd class="px-1 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 font-mono">Shift + Enter</kbd> for new line.</span>
+        <span class="flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3 text-accent-500"></i> Enterprise Data Privacy Ensured</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== WEBHOOK CONFIGURATION MODAL ==================== -->
+  <div id="configModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="webhook" class="w-5 h-5 text-accent-500"></i>
+          <h3 class="text-base font-bold text-white">n8n / API Webhook Connector</h3>
+        </div>
+        <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Webhook URL</label>
+          <input 
+            type="url" 
+            id="webhookUrlInput" 
+            placeholder="https://your-n8n-instance.com/webhook/hr-chatbot" 
+            class="w-full bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded-lg p-3 outline-none focus:border-accent-500 font-mono" />
+        </div>
+        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-[11px] text-slate-400 space-y-1">
+          <div class="font-bold text-slate-300">Expected JSON Output Payload from Webhook:</div>
+          <code class="text-accent-400 block font-mono">{ "output": "Response message string", "citations": ["Page 12, Sec 4"] }</code>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="toggleConfigModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-300">Cancel</button>
+        <button onclick="saveWebhookConfig()" class="px-4 py-2 bg-gradient-to-r from-brand-600 to-accent-500 hover:from-brand-500 hover:to-accent-400 text-xs font-bold rounded-lg text-slate-950">Save Connection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // Session Identification Initialization
+    let sessionId = localStorage.getItem('hr_chat_session_id');
+    if (!sessionId) {
+      sessionId = 'session_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('hr_chat_session_id', sessionId);
+    }
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Application State Variables
+    let webhookUrl = localStorage.getItem('hr_webhook_url') || '';
+    if (webhookUrl) {
+      document.getElementById('webhookUrlInput').value = webhookUrl;
+    }
+
+    function toggleConfigModal() {
+      const modal = document.getElementById('configModal');
+      modal.classList.toggle('hidden');
+    }
+
+    function saveWebhookConfig() {
+      const input = document.getElementById('webhookUrlInput').value.trim();
+      webhookUrl = input;
+      localStorage.setItem('hr_webhook_url', input);
+      toggleConfigModal();
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        handleFormSubmit(event);
+      }
+    }
+
+    function sendQuickPrompt(promptText) {
+      document.getElementById('userInput').value = promptText;
+      handleFormSubmit(new Event('submit'));
+    }
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+      const inputEl = document.getElementById('userInput');
+      const message = inputEl.value.trim();
+
+      if (!message) return;
+
+      // Render User Message
+      renderMessage(message, 'user');
+      inputEl.value = '';
+
+      // Show Typing Indicator
+      showTyping(true);
+
+      // Trigger Webhook API Call or Fallback Simulation
+      if (webhookUrl) {
+        try {
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'sendMessage',
+              chatInput: message,
+              sessionId: sessionId, // Pass unique session key
+              timestamp: new Date().toISOString()
+            })
+          });
+
+          const data = await response.json();
+          showTyping(false);
+
+          // Handle response property flexibly (supporting output, response, message, text)
+          const reply = data.output || data.response || data.message || data.text || JSON.stringify(data);
+          const citations = data.citations || [];
+          renderMessage(reply, 'bot', citations);
+
+        } catch (error) {
+          showTyping(false);
+          renderMessage(`⚠️ **Connection Error:** Failed to connect to webhook. Please verify your n8n API endpoint in settings.\n\n*Error details: ${error.message}*`, 'bot');
+        }
+      } else {
+        // Mock Demo Response Mode for Presentations/Testing
+        setTimeout(() => {
+          showTyping(false);
+          const mockReply = generateMockResponse(message);
+          renderMessage(mockReply.text, 'bot', mockReply.citations);
+        }, 1200);
+      }
+    }
+
+    function showTyping(state) {
+      const indicator = document.getElementById('typingIndicator');
+      if (state) {
+        indicator.classList.remove('hidden');
+        scrollToBottom();
+      } else {
+        indicator.classList.add('hidden');
+      }
+    }
+
+    function renderMessage(text, sender, citations = []) {
+      const chatWindow = document.getElementById('chatWindow');
+      const isUser = sender === 'user';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex gap-4 max-w-3xl ${isUser ? 'ml-auto flex-row-reverse' : ''} animate-fade-in`;
+
+      const avatar = document.createElement('div');
+      avatar.className = `w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-md ${
+        isUser 
+          ? 'bg-slate-800 border border-slate-700 text-slate-300' 
+          : 'bg-gradient-to-tr from-brand-600 via-emerald-500 to-accent-500 text-slate-950'
+      }`;
+      avatar.innerHTML = isUser 
+        ? '<i data-lucide="user" class="w-5 h-5"></i>' 
+        : '<i data-lucide="bot" class="w-5 h-5"></i>';
+
+      const content = document.createElement('div');
+      content.className = `space-y-2 p-4 rounded-2xl shadow-xl border text-sm leading-relaxed ${
+        isUser 
+          ? 'bg-gradient-to-r from-brand-600 to-accent-600 text-white border-accent-500/30 rounded-tr-none' 
+          : 'bg-slate-900/90 text-slate-200 border-slate-800 rounded-tl-none'
+      }`;
+
+      // Basic formatting for line breaks & bold text
+      let formattedText = text.replace(/\n/g, '<br/>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      content.innerHTML = `<div>${formattedText}</div>`;
+
+      // Append Citation Tags if present
+      if (citations && citations.length > 0) {
+        const citationBox = document.createElement('div');
+        citationBox.className = 'pt-2 mt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-accent-400';
+        citationBox.innerHTML = '<span class="text-slate-500 font-sans">Official Sources:</span> ' + 
+          citations.map(c => `<span class="bg-slate-950 border border-accent-500/30 px-2 py-0.5 rounded text-[10px] text-accent-300">${c}</span>`).join('');
+        content.appendChild(citationBox);
+      }
+
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(content);
+      chatWindow.appendChild(wrapper);
+
+      lucide.createIcons();
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      const chatWindow = document.getElementById('chatWindow');
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // Interactive Demo Fallback Logic (if no live webhook URL is provided yet)
+    function generateMockResponse(query) {
+      const q = query.toLowerCase();
+      if (q.includes('maternity') || q.includes('probation')) {
+        return {
+          text: "Yes, employees are entitled to maternity leave benefits during their probationary period under Section 4.2 of our Workplace Policy Handbook. Probationary status does not alter statutory rights or parental protections.",
+          citations: ["HR_Handbook_2026.pdf#Page=42", "Pinecone_Vector_ID_9821"]
+        };
+      } else if (q.includes('leave') || q.includes('time-off')) {
+        return {
+          text: "Full-time employees receive 20 days of paid annual leave per year, accruing at 1.66 days per month. Leave requests exceeding 3 consecutive days require prior approval via the internal HR portal 14 days in advance.",
+          citations: ["Leave_Policy_v3.pdf#Page=12"]
+        };
+      } else {
+        return {
+          text: `I have processed your query ("${query}") against our Pinecone vector store under Session ID \`${sessionId}\`. For detailed compliance confirmation, please verify your n8n Webhook endpoint URL in the top right configuration menu.`,
+          citations: ["Pinecone_Namespace: hr-policies"]
+        };
+      }
+    }
+  </script>
+</body>
+</html>

@@ -61,14 +61,31 @@ Employees ask questions in plain English through a responsive web interface, and
 
 ---
 
-## 📂 Repository Structure
+## 📁 Project Repository Layout
 
-```plaintext
-.
-├── index.html                       # Responsive web application UI
-├── hr_policy_chatbot_workflow.json  # Complete n8n agentic workflow export
-├── docs/                            # Policy documentation samples
-└── README.md                        # System documentation
+```text
+HR-Policy-Intelligent-Chatbot/
+├── docs/
+│   ├── Deep_Tech Executive Summary (HR Policy Chatbot).docx.pdf
+│   └── HR POLICY CHATBOT TECHNICAL PROJECT REPORT.pdf
+├── policy-documents/
+│   └── HUMAN_RESOURCE_POLICIES_-_GESCI__June_2018.pdf
+├── testing/
+│   ├── 01_Pipeline Ingestine Successful.png
+│   ├── 02_Pinecone Dashboard showing vector count greater than zero.png
+│   ├── 03_HR Policy Chatbot Interface.png
+│   ├── 04_Probation-maternity leave.png
+│   ├── 05_Documents to submit for leave.png
+│   ├── 06_Approved number of leave days.png
+│   ├── 07_Time off pay.png
+│   ├── 08_Official leave entitlement.png
+│   ├── 09_Out-of-bounds question correctly triggers the Zero-Hallucination Fallback message..png
+│   └── 10_Multi-turn follow-up question demonstrating active session memory.png
+├── workflows/
+│   ├── HR_Policy_Chat_Pipeline.json
+│   └── HR_Policy_Ingestion_Pipeline.json
+├── index.html
+└── README.md
 ```
 
 ---
